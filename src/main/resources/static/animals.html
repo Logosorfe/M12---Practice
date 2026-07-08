@@ -20,6 +20,21 @@
   ║     Keep width/height/object-fit as plain HTML attributes        ║
   ║  6. Update the form action with th:action and bind               ║
   ║     fields with th:object / th:field                             ║
+  ║                                                                  ║
+  ║  ROLE-BASED UI (adoption feature — see SecurityConfig):          ║
+  ║  7. In AnimalPageController, expose "isAdmin"/"isUser" model     ║
+  ║     attributes, derived from the current Authentication's        ║
+  ║     authorities (ROLE_ADMIN / ROLE_USER — a logged-in user is    ║
+  ║     never both).                                                 ║
+  ║  8. Only render the "Add a new animal" section when isAdmin is   ║
+  ║     true (the backend also rejects POST /animals for non-admins).║
+  ║  9. Per animal, show an "Adopt" button only when isUser is true  ║
+  ║     AND the animal's status is AVAILABLE. It should POST to      ║
+  ║       /api/animals/{id}/adopt                                    ║
+  ║ 10. When isAdmin is true and the animal is ADOPTED, display its  ║
+  ║     adoptionNote (already computed server-side in                ║
+  ║     AnimalResponse) next to the status — everyone else just      ║
+  ║     sees the bare "ADOPTED" status.                              ║
   ╚══════════════════════════════════════════════════════════════════╝
 -->
 <html lang="en">
@@ -59,6 +74,8 @@
             <strong>Luna</strong> — CAT | British Shorthair | Age: 2
             <span class="status-available">AVAILABLE</span>
             <p>Calm and affectionate. Loves cuddles.</p>
+            <!-- USER-only: show when isUser && status == AVAILABLE -->
+            <button type="button">Adopt</button>
           </div>
         </li>
         <li>
@@ -67,6 +84,8 @@
             <strong>Max</strong> — DOG | Labrador | Age: 4
             <span class="status-available">AVAILABLE</span>
             <p>Energetic and friendly. Great with kids.</p>
+            <!-- USER-only: show when isUser && status == AVAILABLE -->
+            <button type="button">Adopt</button>
           </div>
         </li>
         <li>
@@ -74,6 +93,7 @@
           <div class="info">
             <strong>Bella</strong> — DOG | Poodle | Age: 1
             <span class="status-adopted">ADOPTED</span>
+            <!-- ADMIN-only: show animal.adoptionNote, e.g. "adopted by user on 2026-06-01" -->
             <p>Playful and intelligent. Already trained.</p>
           </div>
         </li>
@@ -82,6 +102,7 @@
 
     <!-- ═══════════════════════════════════════════════════════════
          ADD ANIMAL FORM — update action + bind fields in Task A
+         ADMIN-only: wrap this whole <section> in th:if="${isAdmin}"
          ═══════════════════════════════════════════════════════════ -->
     <section aria-label="Add new animal">
       <h2>Add a new animal</h2>

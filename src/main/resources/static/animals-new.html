@@ -21,6 +21,14 @@
   ║  5. Replace each name="..." with th:field="*{fieldName}"         ║
   ║     (you can remove name= and id= — th:field sets them)          ║
   ║  6. Add POST /animals → create + redirect                        ║
+  ║                                                                  ║
+  ║  ADMIN-only page (see SecurityConfig):                           ║
+  ║  7. GET /animals/new and POST /animals are already restricted    ║
+  ║     to ROLE_ADMIN on the backend. Also guard this page:          ║
+  ║       @GetMapping("/animals/new") should redirect (or 403) non-  ║
+  ║       admins instead of just relying on the security filter.     ║
+  ║  8. Only link to this page ("Add animal" in the nav) when        ║
+  ║     isAdmin is true.                                             ║
   ╚══════════════════════════════════════════════════════════════════╝
 -->
 <html lang="en">
@@ -45,6 +53,7 @@
 <body>
 
   <!-- Navigation — same on every page -->
+  <!-- ADMIN-only: only render the "Add animal" link when isAdmin is true -->
   <nav>
     <a href="/">Home</a>
     <a href="/animals">All animals</a>

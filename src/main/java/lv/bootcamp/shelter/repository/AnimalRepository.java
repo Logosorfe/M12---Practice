@@ -1,10 +1,12 @@
 package lv.bootcamp.shelter.repository;
 
+import lv.bootcamp.shelter.model.AdoptionDetails;
 import lv.bootcamp.shelter.model.Animal;
 import lv.bootcamp.shelter.model.AnimalStatus;
 import lv.bootcamp.shelter.model.AnimalType;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -28,27 +30,27 @@ public class AnimalRepository {
         seed("Luna",   AnimalType.CAT,   "Bengal", 2,
                 "Calm and affectionate. Loves cuddles.",
                 "/images/animals/Luna.jpeg",
-                AnimalStatus.AVAILABLE);
+                AnimalStatus.AVAILABLE, null);
         seed("Diora",    AnimalType.DOG,   "Cane Corso",          4,
                 "Energetic and friendly. Great with kids.",
                 "/images/animals/Diora.jpeg",
-                AnimalStatus.AVAILABLE);
+                AnimalStatus.AVAILABLE, null);
         seed("Brita",  AnimalType.DOG,   "German Sheppard",            1,
                 "Playful and intelligent. Already trained.",
                 "/images/animals/Brita.png",
-                AnimalStatus.ADOPTED);
+                AnimalStatus.ADOPTED, new AdoptionDetails("user", LocalDate.of(2026, 6, 1)));
         seed("Dorian", AnimalType.CAT,   "Grey Longhair",      5,
                 "Independent but friendly. Indoor only.",
                 "/images/animals/Dorians.jpeg",
-                AnimalStatus.AVAILABLE);
+                AnimalStatus.AVAILABLE, null);
         seed("Murka", AnimalType.CAT,   "Tortoiseshell  Shorthair",      4,
                 "Curious and active. Needs a yard.",
                 "/images/animals/Murka.jpg",
-                AnimalStatus.AVAILABLE);
+                AnimalStatus.AVAILABLE, null);
         seed("Pepper", AnimalType.OTHER, "Rabbit",            2,
                 "Gentle and curious. Loves fresh vegetables.",
                 "https://www.ohiohollandlops.com/uploads/5/0/2/8/50280945/2489525_orig.jpg",
-                AnimalStatus.AVAILABLE);
+                AnimalStatus.AVAILABLE, null);
     }
 
     /**
@@ -83,8 +85,9 @@ public class AnimalRepository {
     }
 
     private void seed(String name, AnimalType type, String breed, int age,
-                      String description, String imageUrl, AnimalStatus status) {
+                      String description, String imageUrl, AnimalStatus status,
+                      AdoptionDetails adoptionDetails) {
         long id = idSequence.incrementAndGet();
-        store.put(id, new Animal(id, name, type, breed, age, description, status, imageUrl));
+        store.put(id, new Animal(id, name, type, breed, age, description, status, imageUrl, adoptionDetails));
     }
 }

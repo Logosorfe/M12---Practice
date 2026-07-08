@@ -4,12 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lv.bootcamp.shelter.dto.AnimalCreateRequest;
 import lv.bootcamp.shelter.dto.AnimalResponse;
 import lv.bootcamp.shelter.form.AnimalForm;
+import lv.bootcamp.shelter.model.AdoptionDetails;
 import lv.bootcamp.shelter.model.Animal;
 import lv.bootcamp.shelter.model.AnimalStatus;
 import lv.bootcamp.shelter.model.AnimalType;
 import lv.bootcamp.shelter.repository.AnimalRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,9 +93,27 @@ public class AnimalService {
             age,
             description,
                 AnimalStatus.AVAILABLE,
-                resolveImageUrl(imageUrl, type)
+                resolveImageUrl(imageUrl, type),
+                null
         );
         return toResponse(animalRepository.save(animal));
+    }
+
+    /**
+     * Marks an animal as adopted by the given user. Only meaningful for callers with
+     * ROLE_USER — enforced by SecurityConfig, not here.
+     *
+     * @throws IllegalStateException if the animal is already adopted
+     */
+    public Optional<AnimalResponse> adopt(Long id, String userId) {
+        return animalRepository.findById(id).map(animal -> {
+            if (animal.getStatus() == AnimalStatus.ADOPTED) {
+                throw new IllegalStateException("Animal %d is already adopted".formatted(id));
+            }
+            animal.setStatus(AnimalStatus.ADOPTED);
+            animal.setAdoptionDetails(new AdoptionDetails(userId, LocalDate.now()));
+            return toResponse(animalRepository.save(animal));
+        });
     }
 
     private String resolveImageUrl(String imageUrl, AnimalType type) {
@@ -137,7 +159,28 @@ public class AnimalService {
                 animal.getAge(),
                 animal.getDescription(),
                 animal.getStatus(),
-                animal.getImageUrl()
+                animal.getImageUrl(),
+                adoptionNoteFor(animal)
         );
+    }
+
+    /**
+     * Builds the "adopted by {userId} on {date}" note — ADMIN callers only.
+     */
+    private String adoptionNoteFor(Animal animal) {
+        AdoptionDetails details = animal.getAdoptionDetails();
+        if (details == null || !isCurrentUserAdmin()) {
+            return null;
+        }
+        return "adopted by %s on %s".formatted(details.userId(), details.adoptionDate());
+    }
+
+    private boolean isCurrentUserAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
     }
 }

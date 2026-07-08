@@ -7,6 +7,7 @@ import lv.bootcamp.shelter.service.AnimalService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,9 +35,28 @@ public class AnimalApiController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Creates a new animal. Restricted to ROLE_ADMIN — see SecurityConfig.
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AnimalResponse create(@RequestBody @Valid AnimalCreateRequest request) {
         return animalService.create(request);
+    }
+
+    /**
+     * Adopts an animal as the currently logged-in user. Restricted to ROLE_USER
+     * (not ROLE_ADMIN) — see SecurityConfig.
+     */
+    @PostMapping("/{id}/adopt")
+    public ResponseEntity<AnimalResponse> adopt(@PathVariable Long id, Authentication authentication) {
+        return animalService.adopt(id, authentication.getName())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleAlreadyAdopted(IllegalStateException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 }

@@ -26,4 +26,6 @@ public class Animal {
     private String description;
     private AnimalStatus status;
     private String imageUrl;
+    /** Populated only once the animal is adopted (see AnimalService#adopt). */
+    private AdoptionDetails adoptionDetails;
 }
