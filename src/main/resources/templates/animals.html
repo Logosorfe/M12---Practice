@@ -32,7 +32,6 @@
       <div>
         <strong th:text="${a.name}"></strong>
 
-        <!-- Status badge -->
         <span th:classappend="${a.status.name() == 'ADOPTED'} ? 'badge-adopted' : 'badge-available'"
               th:text="${a.status}">
         </span>

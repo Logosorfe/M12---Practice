@@ -22,7 +22,6 @@
 
 <main>
 
-  <!-- ADMIN ONLY -->
   <div th:if="${isAdmin}">
     <h1>Add a New Animal</h1>
 
@@ -59,7 +58,6 @@
     <a th:href="@{/animals}">← Back to list</a>
   </div>
 
-  <!-- NON-ADMIN -->
   <div th:if="${!isAdmin}">
     <p>You do not have permission to add animals.</p>
     <a th:href="@{/animals}">← Back to list</a>
