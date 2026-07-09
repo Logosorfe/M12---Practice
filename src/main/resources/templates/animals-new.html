@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Animal</title>
+
+  <style>
+    body { font-family: sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; }
+    nav { background: #f1f5f9; padding: 0.6rem 1rem; border-radius: 6px; margin-bottom: 1.5rem; }
+    nav a { margin-right: 1rem; text-decoration: none; color: #2563eb; }
+    nav a:hover { text-decoration: underline; }
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.4rem; }
+    label { display: block; margin-top: 1rem; }
+    input, select, textarea { width: 100%; padding: 0.4rem; margin-top: 0.3rem; }
+    button { margin-top: 1rem; padding: 0.6rem 1.2rem; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<main>
+
+  <!-- ADMIN ONLY -->
+  <div th:if="${isAdmin}">
+    <h1>Add a New Animal</h1>
+
+    <form th:action="@{/animals}" th:object="${form}" method="post">
+
+      <label>Name</label>
+      <input th:field="*{name}" type="text">
+      <span th:errors="*{name}" class="error"></span>
+
+      <label>Type</label>
+      <select th:field="*{type}">
+        <option value="">— choose —</option>
+        <option th:each="t : ${types}"
+                th:value="${t}"
+                th:text="${t}">
+        </option>
+      </select>
+
+      <label>Breed</label>
+      <input th:field="*{breed}" type="text">
+
+      <label>Age</label>
+      <input th:field="*{age}" type="number" min="0">
+
+      <label>Description</label>
+      <textarea th:field="*{description}" rows="3"></textarea>
+
+      <label>Image filename</label>
+      <input th:field="*{imageUrl}" type="text">
+
+      <button type="submit">Add animal</button>
+    </form>
+
+    <a th:href="@{/animals}">← Back to list</a>
+  </div>
+
+  <!-- NON-ADMIN -->
+  <div th:if="${!isAdmin}">
+    <p>You do not have permission to add animals.</p>
+    <a th:href="@{/animals}">← Back to list</a>
+  </div>
+
+</main>
+
+</body>
+</html>

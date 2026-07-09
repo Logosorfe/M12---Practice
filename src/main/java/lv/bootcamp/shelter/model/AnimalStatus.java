@@ -5,5 +5,5 @@ package lv.bootcamp.shelter.model;
  */
 public enum AnimalStatus {
     AVAILABLE,
-    ADOPTED
+    ADOPTED;
 }

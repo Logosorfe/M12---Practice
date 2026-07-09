@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Animal Details</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<main>
+    <h1 th:text="${animal.name}"></h1>
+
+    <img th:src="${animal.imageUrl}" width="300" height="200" style="object-fit: cover;">
+
+    <p>Type: <span th:text="${animal.type}"></span></p>
+    <p>Breed: <span th:text="${animal.breed}"></span></p>
+    <p>Age: <span th:text="${animal.age}"></span></p>
+    <p>Description: <span th:text="${animal.description}"></span></p>
+
+    <p>Status: <span th:text="${animal.status}"></span></p>
+
+    <p th:if="${animal.adoptionNote}" th:text="${animal.adoptionNote}"></p>
+
+    <a th:href="@{/animals}">← Back to list</a>
+</main>
+
+</body>
+</html>

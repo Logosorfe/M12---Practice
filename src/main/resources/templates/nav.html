@@ -1,0 +1,7 @@
+<nav th:fragment="nav">
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/animals}">All animals</a>
+    <a th:if="${isAdmin}" th:href="@{/animals/new}">Add animal</a>
+    <a th:href="@{/swagger-ui/index.html}">Swagger</a>
+    <a th:href="@{/login}">Login</a>
+</nav>

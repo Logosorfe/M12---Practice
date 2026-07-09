@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Shelter Animals</title>
+
+  <style>
+    body { font-family: sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; }
+    nav { background: #f1f5f9; padding: 0.6rem 1rem; border-radius: 6px; margin-bottom: 1.5rem; }
+    nav a { margin-right: 1rem; text-decoration: none; color: #2563eb; }
+    nav a:hover { text-decoration: underline; }
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.4rem; }
+    .badge-adopted { color: #777; font-weight: bold; }
+    .badge-available { color: green; font-weight: bold; }
+    ul { list-style: none; padding: 0; }
+    li { margin-bottom: 2rem; }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<main>
+  <h1>All Animals</h1>
+
+  <ul>
+    <li th:each="a : ${animals}">
+      <img th:src="${a.imageUrl}"
+           th:alt="${a.name}"
+           width="300" height="200" style="object-fit: cover;">
+
+      <div>
+        <strong th:text="${a.name}"></strong>
+
+        <!-- Status badge -->
+        <span th:classappend="${a.status.name() == 'ADOPTED'} ? 'badge-adopted' : 'badge-available'"
+              th:text="${a.status}">
+        </span>
+
+        <span th:if="${isAdmin and a.adoptionNote}"
+              th:text="${a.adoptionNote}">
+        </span>
+
+        <p>
+          <span th:text="${a.type}"></span> |
+          <span th:text="${a.breed}"></span> |
+          Age: <span th:text="${a.age}"></span>
+        </p>
+
+        <p th:text="${a.description}"></p>
+
+        <form th:if="${isUser and a.status.name() == 'AVAILABLE'}"
+              th:action="@{'/api/animals/' + ${a.id} + '/adopt'}"
+              method="post">
+          <button type="submit">Adopt</button>
+        </form>
+
+      </div>
+    </li>
+  </ul>
+
+</main>
+
+</body>
+</html>

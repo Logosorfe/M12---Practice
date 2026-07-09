@@ -6,5 +6,5 @@ package lv.bootcamp.shelter.model;
 public enum AnimalType {
     CAT,
     DOG,
-    OTHER
+    OTHER;
 }
