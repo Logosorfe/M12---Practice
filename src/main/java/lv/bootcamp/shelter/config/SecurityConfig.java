@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -67,6 +68,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * </ol>
  */
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -102,6 +104,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,
                                 "/", "/*.html", "/css/**", "/js/**", "/images/**", "/favicon.ico")
                         .permitAll()
+                        .requestMatchers("/login", "/error").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v1/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/animals/adopted").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/animals/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/animals/new").hasRole("ADMIN")
@@ -111,7 +115,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/animals").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .formLogin(Customizer.withDefaults())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .logout(Customizer.withDefaults());
 

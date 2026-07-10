@@ -1,5 +1,10 @@
 package lv.bootcamp.shelter.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lv.bootcamp.shelter.dto.AnimalCreateRequest;
 import lv.bootcamp.shelter.dto.AnimalResponse;
@@ -19,16 +24,30 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/animals")
+@Tag(name = "Animals", description = "Operations for managing shelter animals")
+@SecurityRequirement(name = "basicAuth")
 public class AnimalApiController {
 
     private final AnimalService animalService;
 
     @GetMapping
+    @Operation(
+            summary = "List all animals",
+            description = "Returns all animals currently registered in the shelter"
+    )
+    @ApiResponse(responseCode = "200", description = "List returned")
+    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
     public List<AnimalResponse> findAll() {
         return animalService.findAll();
     }
 
     @GetMapping("/{id}")
+    @Operation(
+            summary = "Get animal by ID",
+            description = "Returns a single animal by its ID"
+    )
+    @ApiResponse(responseCode = "200", description = "Animal found")
+    @ApiResponse(responseCode = "404", description = "Animal not found", content = @Content)
     public ResponseEntity<AnimalResponse> findById(@PathVariable Long id) {
         return animalService.findById(id)
                 .map(ResponseEntity::ok)
@@ -42,6 +61,13 @@ public class AnimalApiController {
      * has no side effects, unlike {@code POST /api/animals}.
      */
     @GetMapping("/adopted")
+    @Operation(
+            summary = "List adopted animals",
+            description = "Returns all animals that have been adopted (ADMIN only)"
+    )
+    @ApiResponse(responseCode = "200", description = "List returned")
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Admin only", content = @Content)
     public List<AnimalResponse> findAdopted() {
         return animalService.findAdopted();
     }
@@ -51,6 +77,14 @@ public class AnimalApiController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+            summary = "Create a new animal",
+            description = "Registers a new animal in the shelter (ADMIN only)"
+    )
+    @ApiResponse(responseCode = "201", description = "Animal created")
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Admin only", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Validation failed", content = @Content)
     public AnimalResponse create(@RequestBody @Valid AnimalCreateRequest request) {
         return animalService.create(request);
     }
@@ -60,14 +94,17 @@ public class AnimalApiController {
      * (not ROLE_ADMIN) — see SecurityConfig.
      */
     @PostMapping("/{id}/adopt")
+    @Operation(
+            summary = "Adopt an animal",
+            description = "Marks an animal as adopted by the currently logged-in user (USER only)"
+    )
+    @ApiResponse(responseCode = "200", description = "Animal adopted")
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    @ApiResponse(responseCode = "403", description = "User only", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Animal not found", content = @Content)
     public ResponseEntity<AnimalResponse> adopt(@PathVariable Long id, Authentication authentication) {
         return animalService.adopt(id, authentication.getName())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<String> handleAlreadyAdopted(IllegalStateException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 }
