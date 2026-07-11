@@ -62,9 +62,9 @@ What is missing from Basic scope? Entire Practical 2: springdoc-openapi-starter-
 your pom.xml, but your OpenApiConfig class with title/version/description is absent, and your
 AnimalApiController has no @Tag, @Operation, or @ApiResponse annotations.
 
-What should be improved in code quality? No issues with quality in your Thymeleaf part. Worth noting that
-your isAdmin()/isUser() are called multiple times per request via SecurityContextHolder — consolidate
-into a single @ModelAttribute helper to avoid the repeated thread-local lookup.
+What should be improved in code quality? No issues with quality in your Thymeleaf part. Worth noting
+that your isAdmin()/isUser() are called multiple times per request via SecurityContextHolder —
+consolidate into a single @ModelAttribute helper to avoid the repeated thread-local lookup.
 
 Note (timeliness): part of your submission was pushed after the session cutoff, which resulted in a
 late-submission deduction.
